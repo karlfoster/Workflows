@@ -1,0 +1,30 @@
+name: Workflows
+options:
+  bundleIdPrefix: com.karlfoster
+  deploymentTarget:
+    macOS: "14.0"
+packages:
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 2.0.0
+targets:
+  Workflows:
+    type: application
+    platform: macOS
+    sources:
+      - Sources
+    dependencies:
+      - package: KeyboardShortcuts
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.karlfoster.Workflows
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        GENERATE_INFOPLIST_FILE: YES
+        # Menu-bar-only app: no Dock icon, no app switcher entry.
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        INFOPLIST_KEY_NSAppleEventsUsageDescription: "Workflows uses System Events to toggle appearance settings in your workflows."
