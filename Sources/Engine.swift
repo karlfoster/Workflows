@@ -105,9 +105,15 @@ enum Engine {
         guard !step.text.isEmpty else { return }
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         guard AXIsProcessTrustedWithOptions(options) else { return }
-        // Give the menu time to close and hotkey modifiers time to release,
-        // so the text lands in the field instead of triggering shortcuts.
-        try? await Task.sleep(for: .milliseconds(150))
+        // Wait for hotkey modifiers to be physically released, so held ⌘/⌥
+        // don't turn the typed characters into shortcuts. Near-instant when
+        // run from the menu; capped so a stuck key can't stall the workflow.
+        let modifierMask: CGEventFlags = [.maskCommand, .maskAlternate, .maskControl, .maskShift]
+        var waited = 0
+        while !CGEventSource.flagsState(.hidSystemState).intersection(modifierMask).isEmpty, waited < 500 {
+            try? await Task.sleep(for: .milliseconds(10))
+            waited += 10
+        }
         let source = CGEventSource(stateID: .hidSystemState)
         let units = Array(step.text.utf16)
         var index = 0
