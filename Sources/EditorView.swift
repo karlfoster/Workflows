@@ -184,6 +184,9 @@ private struct StepRowView: View {
 
         case .runShortcut:
             AppleShortcutPicker(name: $step.text)
+
+        case .slackToClaude:
+            SlackStepSettings()
         }
     }
 

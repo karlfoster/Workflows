@@ -4,6 +4,10 @@ import SwiftUI
 struct WorkflowsApp: App {
     @StateObject private var store = Store()
 
+    init() {
+        SlackKeychain.storeFromCommandLineIfAsked()
+    }
+
     var body: some Scene {
         MenuBarExtra {
             MenuView()

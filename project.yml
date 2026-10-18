@@ -18,13 +18,42 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.karlfoster.Workflows
-        MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.1.0"
+        CURRENT_PROJECT_VERSION: "2"
         SWIFT_VERSION: "5.0"
         CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "-"
+        # A real identity, not ad hoc ("-"), so every build is the same app to
+        # macOS: Accessibility access and the Slack token in the Keychain
+        # survive updates.
+        CODE_SIGN_IDENTITY: "Developer ID Application"
+        DEVELOPMENT_TEAM: UPYX9DMV5Z
         GENERATE_INFOPLIST_FILE: YES
         # Menu-bar-only app: no Dock icon, no app switcher entry.
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_NSHumanReadableCopyright: ""
         INFOPLIST_KEY_NSAppleEventsUsageDescription: "Workflows uses System Events to toggle appearance settings in your workflows."
+  # The Slack step's text and parsing, tested without the app (no host, so no second copy of
+  # Workflows starts with your workflows and hotkeys).
+  WorkflowsTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests
+      - Sources/Slack/SlackText.swift
+      - Sources/Slack/SlackAPI.swift
+      - Sources/Slack/SlackWindow.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.karlfoster.WorkflowsTests
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+schemes:
+  Workflows:
+    build:
+      targets:
+        Workflows: all
+    test:
+      targets:
+        - WorkflowsTests

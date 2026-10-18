@@ -7,20 +7,38 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02F1E0993EFC5FEDC87D89D0 /* SlackToClaude.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CD6C23C1875F2AC31F124E /* SlackToClaude.swift */; };
+		0EDEF6E7F2BBBB44E9198288 /* SlackAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964B72670A0A4A4C836129F8 /* SlackAPI.swift */; };
 		2BE32085EA00F05F1CB88369 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4783A062C6A34A867D786E /* App.swift */; };
 		2DD4586AF5BF395CB2B37261 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F92E4031ABC1FF6D3B470 /* Engine.swift */; };
+		38FABA6087460FC3E063F845 /* SlackKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 765C6DDBA9EE2E267D3BE698 /* SlackKeychain.swift */; };
+		46D83E24FF30AEAC1DCF89A1 /* SlackWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B545BB1C982D4A4F2A675 /* SlackWindow.swift */; };
 		56847830DE01633BD9662A42 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E2F5263E9616BDB30E633B /* Models.swift */; };
+		6AD034489802EAEC060FC935 /* SlackAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964B72670A0A4A4C836129F8 /* SlackAPI.swift */; };
 		7508BF867C4DE297DDE5EB57 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E5B4330BF777A98ED474C2 /* EditorView.swift */; };
+		94ECFE80280A8D6FCCD2330E /* SlackText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D32E2FBA7B191A4231033F2 /* SlackText.swift */; };
 		B0222F8544C72A09F00A1B4C /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 59EC4B863DB294B3215ECCDE /* KeyboardShortcuts */; };
+		CBD070515820CF1167B32A01 /* SlackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7715C58958D1906331E886 /* SlackTests.swift */; };
 		D6EE5980E9BCE3E4DBE6E992 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA876AFF438B3B563D18F1D /* MenuView.swift */; };
+		D81BD0507AEBB5787B5295FF /* SlackText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D32E2FBA7B191A4231033F2 /* SlackText.swift */; };
+		DA4132866C5341C921D1A810 /* SlackWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B545BB1C982D4A4F2A675 /* SlackWindow.swift */; };
+		DE14FBA899ED4485A2136D40 /* SlackStepSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C299A1C4D50D628082FC91 /* SlackStepSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		10E2F5263E9616BDB30E633B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		22CD6C23C1875F2AC31F124E /* SlackToClaude.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackToClaude.swift; sourceTree = "<group>"; };
+		765C6DDBA9EE2E267D3BE698 /* SlackKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackKeychain.swift; sourceTree = "<group>"; };
 		82E5B4330BF777A98ED474C2 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
+		8C4B545BB1C982D4A4F2A675 /* SlackWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackWindow.swift; sourceTree = "<group>"; };
+		964B72670A0A4A4C836129F8 /* SlackAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackAPI.swift; sourceTree = "<group>"; };
+		9D32E2FBA7B191A4231033F2 /* SlackText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackText.swift; sourceTree = "<group>"; };
 		9FA876AFF438B3B563D18F1D /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		A69F92E4031ABC1FF6D3B470 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
+		B9C299A1C4D50D628082FC91 /* SlackStepSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackStepSettings.swift; sourceTree = "<group>"; };
 		D032B5827431DFDB13B705B3 /* Workflows.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Workflows.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB7715C58958D1906331E886 /* SlackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackTests.swift; sourceTree = "<group>"; };
+		F47FB440F761F54B50688585 /* WorkflowsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WorkflowsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4783A062C6A34A867D786E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -36,10 +54,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A029DDE74CC5D2CB7D97693 /* Slack */ = {
+			isa = PBXGroup;
+			children = (
+				964B72670A0A4A4C836129F8 /* SlackAPI.swift */,
+				765C6DDBA9EE2E267D3BE698 /* SlackKeychain.swift */,
+				B9C299A1C4D50D628082FC91 /* SlackStepSettings.swift */,
+				9D32E2FBA7B191A4231033F2 /* SlackText.swift */,
+				22CD6C23C1875F2AC31F124E /* SlackToClaude.swift */,
+				8C4B545BB1C982D4A4F2A675 /* SlackWindow.swift */,
+			);
+			path = Slack;
+			sourceTree = "<group>";
+		};
 		3E99D311F2F9D3E0CE392734 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				D032B5827431DFDB13B705B3 /* Workflows.app */,
+				F47FB440F761F54B50688585 /* WorkflowsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				6F83AF940DE9EE3F91BB4147 /* Sources */,
+				D0488E607DE89CEB07A2DBDC /* Tests */,
 				3E99D311F2F9D3E0CE392734 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,13 +93,39 @@
 				A69F92E4031ABC1FF6D3B470 /* Engine.swift */,
 				9FA876AFF438B3B563D18F1D /* MenuView.swift */,
 				10E2F5263E9616BDB30E633B /* Models.swift */,
+				0A029DDE74CC5D2CB7D97693 /* Slack */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		D0488E607DE89CEB07A2DBDC /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				DB7715C58958D1906331E886 /* SlackTests.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4808CFD0E41E40AC47D7FA76 /* WorkflowsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8F1EAE61E3859E1DD2DA44F /* Build configuration list for PBXNativeTarget "WorkflowsTests" */;
+			buildPhases = (
+				1BA20B1F6A5635DA343FA829 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WorkflowsTests;
+			packageProductDependencies = (
+			);
+			productName = WorkflowsTests;
+			productReference = F47FB440F761F54B50688585 /* WorkflowsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C1F7124154D48056BB5BC3EB /* Workflows */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8FFDC80800E08BD40AEE33B5 /* Build configuration list for PBXNativeTarget "Workflows" */;
@@ -95,7 +154,11 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					4808CFD0E41E40AC47D7FA76 = {
+						ProvisioningStyle = Manual;
+					};
 					C1F7124154D48056BB5BC3EB = {
+						DevelopmentTeam = UPYX9DMV5Z;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -118,11 +181,23 @@
 			projectRoot = "";
 			targets = (
 				C1F7124154D48056BB5BC3EB /* Workflows */,
+				4808CFD0E41E40AC47D7FA76 /* WorkflowsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1BA20B1F6A5635DA343FA829 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AD034489802EAEC060FC935 /* SlackAPI.swift in Sources */,
+				CBD070515820CF1167B32A01 /* SlackTests.swift in Sources */,
+				94ECFE80280A8D6FCCD2330E /* SlackText.swift in Sources */,
+				46D83E24FF30AEAC1DCF89A1 /* SlackWindow.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FD55B34A530D2F769C53CB50 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -132,6 +207,12 @@
 				2DD4586AF5BF395CB2B37261 /* Engine.swift in Sources */,
 				D6EE5980E9BCE3E4DBE6E992 /* MenuView.swift in Sources */,
 				56847830DE01633BD9662A42 /* Models.swift in Sources */,
+				0EDEF6E7F2BBBB44E9198288 /* SlackAPI.swift in Sources */,
+				38FABA6087460FC3E063F845 /* SlackKeychain.swift in Sources */,
+				DE14FBA899ED4485A2136D40 /* SlackStepSettings.swift in Sources */,
+				D81BD0507AEBB5787B5295FF /* SlackText.swift in Sources */,
+				02F1E0993EFC5FEDC87D89D0 /* SlackToClaude.swift in Sources */,
+				DA4132866C5341C921D1A810 /* SlackWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,14 +338,34 @@
 			};
 			name = Release;
 		};
+		3E15D401CD21B51F208BE8F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.karlfoster.WorkflowsTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		8EF420D7987B07E49073B8FF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = UPYX9DMV5Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Workflows uses System Events to toggle appearance settings in your workflows.";
@@ -273,21 +374,41 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.karlfoster.Workflows;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
+		9244E1C7C36FE3F0FB4728DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.karlfoster.WorkflowsTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
 		BC96EDA67A0C55BA42FCEC4A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = UPYX9DMV5Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Workflows uses System Events to toggle appearance settings in your workflows.";
@@ -296,7 +417,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.karlfoster.Workflows;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
@@ -311,6 +432,15 @@
 			buildConfigurations = (
 				BC96EDA67A0C55BA42FCEC4A /* Debug */,
 				8EF420D7987B07E49073B8FF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B8F1EAE61E3859E1DD2DA44F /* Build configuration list for PBXNativeTarget "WorkflowsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9244E1C7C36FE3F0FB4728DE /* Debug */,
+				3E15D401CD21B51F208BE8F3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
