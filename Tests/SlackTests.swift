@@ -48,6 +48,12 @@ final class SlackWindowTests: XCTestCase {
         XCTAssertEqual(thread?.conversation, "D08ABCDEF12")
     }
 
+    func testThreadPaneLinkGivesConversation() {
+        XCTAssertEqual(SlackWindow.conversation(inLink: "https://acme.slack.com/archives/C0456EFGH12/p1794320876213879?thread_ts=1794314111.193889&cid=C0456EFGH12"), "C0456EFGH12")
+        XCTAssertEqual(SlackWindow.conversation(inLink: "https://acme.slack.com/archives/D08ABCDEF12/p1794314111193889"), "D08ABCDEF12")
+        XCTAssertNil(SlackWindow.conversation(inLink: "https://acme.slack.com/team/U08UWMK5PE3"))
+    }
+
     func testPagesThatAreNotConversations() {
         XCTAssertNil(SlackWindow.parse(address: "https://app.slack.com/client/T0123ABCD9/activity")?.conversation)
         XCTAssertNil(SlackWindow.parse(address: "https://app.slack.com/client/T0123ABCD9/F0123456789")?.conversation)

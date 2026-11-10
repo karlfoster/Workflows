@@ -57,7 +57,60 @@ enum SlackWindow {
             shown.teamID = parsed.team
             shown.conversationID = parsed.conversation
         }
+        // Activity, Later, search and the like have no conversation in the address. If a thread
+        // is open beside them, its message links name the channel or chat it belongs to.
+        if shown.conversationID == nil, let link = threadLink(in: window) {
+            shown.conversationID = conversation(inLink: link)
+            if shown.conversationID != nil { shown.title = nil }
+        }
         return .success(shown)
+    }
+
+    /// The first message link inside an open thread pane, if there is one.
+    private static func threadLink(in window: AXUIElement) -> String? {
+        var stack: [AXUIElement] = [window]
+        var visited = 0
+        // Depth-first, so the thread pane's links are reached without walking every message
+        // in the list beside it first.
+        var paneFound: AXUIElement?
+        while let element = stack.popLast(), visited < 6000 {
+            visited += 1
+            let classes = (value(element, "AXDOMClassList") as? [String]) ?? []
+            if classes.contains(where: { $0 == "p-threads_flexpane" || $0 == "p-threads_flexpane_container" }) {
+                paneFound = element
+                break
+            }
+            let children = (value(element, kAXChildrenAttribute) as? [AXUIElement]) ?? []
+            stack.append(contentsOf: children.reversed())
+        }
+        guard let pane = paneFound else { return nil }
+        var queue: [AXUIElement] = [pane]
+        visited = 0
+        while !queue.isEmpty, visited < 2000 {
+            let element = queue.removeFirst()
+            visited += 1
+            if let url = value(element, "AXURL") {
+                let text = (url as? URL)?.absoluteString ?? (url as? String) ?? "\(url)"
+                if text.contains("/archives/") { return text }
+            }
+            queue.append(contentsOf: (value(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [])
+        }
+        return nil
+    }
+
+    /// The channel or chat in a message link like
+    /// `https://acme.slack.com/archives/C0456EFGH12/p1794314111193889?thread_ts=…&cid=C0456EFGH12`.
+    static func conversation(inLink link: String) -> String? {
+        guard let url = URLComponents(string: link) else { return nil }
+        let pattern = "^[CDG][A-Z0-9]{6,}$"
+        if let cid = url.queryItems?.first(where: { $0.name == "cid" })?.value,
+           cid.range(of: pattern, options: .regularExpression) != nil {
+            return cid
+        }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard let archives = parts.firstIndex(of: "archives"), archives + 1 < parts.count else { return nil }
+        let candidate = parts[archives + 1]
+        return candidate.range(of: pattern, options: .regularExpression) != nil ? candidate : nil
     }
 
     /// The address of the page in Slack's window: its web area's AXURL, a few levels down.
