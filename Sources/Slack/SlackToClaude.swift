@@ -21,6 +21,8 @@ final class SlackToClaude: ObservableObject {
         var inPrompt: String
         /// My Slack user ID.
         var me: String
+        /// The token for this conversation's workspace.
+        var token: String
     }
 
     @Published var range: SlackRange {
@@ -93,19 +95,13 @@ final class SlackToClaude: ObservableObject {
     }
 
     private func resolve(_ shown: SlackWindow.Shown) async {
-        guard let token = SlackKeychain.token() else {
+        let stored = SlackKeychain.all()
+        guard !stored.isEmpty else {
             problem = SlackError.notConnected.explanation
             return
         }
-        let api = SlackAPI(token: token)
         do {
-            let account = try await SlackDirectory.shared.account(api)
-            let elsewhere = shown.teamID.map { $0 != account.teamId }
-                ?? shown.title.map { $0.workspace != account.team } ?? false
-            if elsewhere {
-                problem = "Slack is showing another workspace. Only \(account.team) is connected."
-                return
-            }
+            let (account, api) = try await Self.workspace(for: shown, among: stored.map(\.token))
             var id = shown.conversationID
             if id == nil, let title = shown.title {
                 if title.kind.lowercased().contains("channel") {
@@ -132,26 +128,47 @@ final class SlackToClaude: ObservableObject {
         }
     }
 
+    /// The connected account for the workspace Slack is showing, matched by the window's team ID,
+    /// else its title's workspace name. With neither, Slack isn't showing a conversation, which
+    /// any account can go on to say.
+    private static func workspace(for shown: SlackWindow.Shown, among tokens: [String]) async throws -> (SlackAPI.AuthTest, SlackAPI) {
+        var accounts: [(SlackAPI.AuthTest, SlackAPI)] = []
+        var firstError: Error?
+        for token in tokens {
+            let api = SlackAPI(token: token)
+            do { accounts.append((try await SlackDirectory.shared.account(api), api)) } catch is CancellationError {
+                throw CancellationError()
+            } catch { firstError = firstError ?? error }
+        }
+        if let id = shown.teamID, let match = accounts.first(where: { $0.0.teamId == id }) { return match }
+        if shown.teamID == nil, let name = shown.title?.workspace,
+           let match = accounts.first(where: { $0.0.team == name }) { return match }
+        if shown.teamID == nil, shown.title == nil, let first = accounts.first { return first }
+        if accounts.isEmpty, let firstError { throw firstError }
+        let names = SlackToClaude.list(accounts.map(\.0.team))
+        throw SlackError.otherWorkspace(connected: names.isEmpty ? "no workspace" : names)
+    }
+
     private func describe(_ channel: SlackAPI.Channel, account: SlackAPI.AuthTest, api: SlackAPI) async throws -> Place {
         let workspace = account.team
         if channel.isIm == true, let user = channel.user {
             let name = try await SlackDirectory.shared.names([user], api)[user] ?? "someone"
             return Place(id: channel.id, heading: name, detail: "Direct message in \(workspace)", symbol: "person",
-                         inPrompt: "my direct messages with \(name) in the \(workspace) Slack workspace", me: account.userId)
+                         inPrompt: "my direct messages with \(name) in the \(workspace) Slack workspace", me: account.userId, token: api.token)
         }
         if channel.isMpim == true {
             let members = try await api.members(channel.id).filter { $0 != account.userId }
             let names = try await SlackDirectory.shared.names(Set(members), api)
             let list = Self.list(members.map { names[$0] ?? "someone" })
             return Place(id: channel.id, heading: list, detail: "Group chat in \(workspace)", symbol: "person.2",
-                         inPrompt: "my group chat with \(list) in the \(workspace) Slack workspace", me: account.userId)
+                         inPrompt: "my group chat with \(list) in the \(workspace) Slack workspace", me: account.userId, token: api.token)
         }
         let name = "#" + (channel.name ?? "channel")
         let isPrivate = channel.isPrivate == true || channel.isGroup == true
         return Place(id: channel.id, heading: name, detail: "\(isPrivate ? "Private channel" : "Channel") in \(workspace)",
                      symbol: isPrivate ? "lock" : "number",
                      inPrompt: "\(name), a \(isPrivate ? "private " : "")channel in the \(workspace) Slack workspace",
-                     me: account.userId)
+                     me: account.userId, token: api.token)
     }
 
     /// "Ana Silva, Ben Okafor and Chloe Martin".
@@ -167,8 +184,7 @@ final class SlackToClaude: ObservableObject {
 
     private func sendNow(_ place: Place, range: SlackRange, ask: String) async {
         do {
-            guard let token = SlackKeychain.token() else { throw SlackError.notConnected }
-            var api = SlackAPI(token: token)
+            var api = SlackAPI(token: place.token)
             api.onWait = { [weak self] seconds in
                 await MainActor.run { self?.working = "Slack asked to slow down, so waiting \(seconds) s…" }
             }

@@ -31,9 +31,9 @@ With a channel or chat open in Slack's desktop app, press the workflow's shortcu
 - **Which conversation:** read through Accessibility from Slack's window. Its page address carries the workspace and conversation IDs. In the Direct messages view the address has no ID (`…/client/T…/dms`), so the window title's names ("Ana Silva, Ben Okafor (DM)") are matched to people and then to your DM or group chat with exactly them. Channel names in the title are the fallback for channels.
 - **Read-only:** `SlackAPI.get` refuses any Slack method outside `SlackAPI.readMethods`, so the step can't post, react or change anything, whatever the token allows.
 - **Limits:** Full history reads the newest 100 messages and every thread under them, so a small channel comes in whole and a busy one stays quick. The other choices read up to 500 messages and the replies of the newest 60 threads; older threads are marked with how many replies weren't read. If Slack asks it to slow down, the panel says it's waiting.
-- **One workspace:** the token's. Slack showing another workspace gets a message, not a read.
+- **Several workspaces:** one token per workspace. The step reads with the token whose workspace Slack is showing (the address's team ID, else the window title's workspace name). A workspace with no token gets a message, not a read.
 - **Long conversations:** Claude's link takes about 14,000 characters, so the prompt holds the newest messages that fit under 12,000. The whole conversation is then saved to `~/Library/Application Support/Workflows/Slack/` and the prompt asks Claude to read that file (past 150,000 characters, to search it). Saved conversations are cleared after three days.
-- **Token:** a Slack user token (`xoxp-…`) with `channels:history`, `groups:history`, `im:history`, `mpim:history`, the matching `:read` scopes and `users:read`. It's kept only in the login Keychain (`com.karlfoster.Workflows.slack`). Add or change it on the step in the editor, or pipe it in so it never shows in a command line:
+- **Token:** a Slack user token (`xoxp-…`) with `channels:history`, `groups:history`, `im:history`, `mpim:history`, the matching `:read` scopes and `users:read`. Each is kept only in the login Keychain (`com.karlfoster.Workflows.slack`, one item per workspace, its account the team ID; a token saved by an older version stays under `token`). Add or remove workspaces on the step in the editor, or pipe a token in so it never shows in a command line; it's checked with Slack and saved for its workspace:
 
   ```sh
   /Applications/Workflows.app/Contents/MacOS/Workflows --store-slack-token < token.txt
@@ -67,7 +67,7 @@ The app is signed with a Developer ID Application certificate (team UPYX9DMV5Z i
 
 ## Where data is stored
 
-Workflows and their steps are saved as JSON in the app's `UserDefaults` under the key `workflows`, so they live in `~/Library/Preferences/com.karlfoster.Workflows.plist`. Keyboard shortcuts are stored by the KeyboardShortcuts package, keyed by each workflow's UUID. The Slack token is in the login Keychain, and the "How far back" choice in `UserDefaults` under `slackToClaudeRange`.
+Workflows and their steps are saved as JSON in the app's `UserDefaults` under the key `workflows`, so they live in `~/Library/Preferences/com.karlfoster.Workflows.plist`. Keyboard shortcuts are stored by the KeyboardShortcuts package, keyed by each workflow's UUID. The Slack tokens are in the login Keychain, and the "How far back" choice in `UserDefaults` under `slackToClaudeRange`.
 
 ## Licence
 

@@ -7,6 +7,8 @@ enum SlackError: Error, Equatable {
     case slack(String)
     /// Slack couldn't be reached.
     case unreachable
+    /// Slack is showing a workspace with no token; these are the ones connected.
+    case otherWorkspace(connected: String)
 
     /// What the panel and the step's settings say.
     var explanation: String {
@@ -23,6 +25,8 @@ enum SlackError: Error, Equatable {
             "Slack said “\(code)”."
         case .unreachable:
             "Couldn't reach Slack. Check the connection and try again."
+        case let .otherWorkspace(connected):
+            "Slack is showing a workspace that isn't connected. Connected: \(connected). Add its token in Edit Workflows…, on the Send Slack to Claude step."
         }
     }
 }
@@ -512,55 +516,50 @@ struct SlackReader {
     }
 }
 
-/// Who's who, kept while the app runs: the token's own account and people's names.
+/// Who's who, kept while the app runs, for each token: its own account and people's names.
 actor SlackDirectory {
     static let shared = SlackDirectory()
 
-    private var token = ""
-    private var account: SlackAPI.AuthTest?
-    private var names: [String: String] = [:]
-    private var people: [SlackAPI.User] = []
-    private var peopleRead = Date.distantPast
-
-    private func use(_ api: SlackAPI) {
-        guard api.token != token else { return }
-        token = api.token
-        account = nil
-        names = [:]
-        people = []
-        peopleRead = .distantPast
+    private struct Known {
+        var account: SlackAPI.AuthTest?
+        var names: [String: String] = [:]
+        var people: [SlackAPI.User] = []
+        var peopleRead = Date.distantPast
     }
 
+    private var known: [String: Known] = [:]
+
     func account(_ api: SlackAPI) async throws -> SlackAPI.AuthTest {
-        use(api)
-        if let account { return account }
+        if let account = known[api.token]?.account { return account }
         let fetched = try await api.auth()
-        account = fetched
+        known[api.token, default: Known()].account = fetched
         return fetched
     }
 
     /// Everyone in the workspace, read again after six hours so new people turn up.
     func everyone(_ api: SlackAPI) async throws -> [SlackAPI.User] {
-        use(api)
-        if !people.isEmpty, Date().timeIntervalSince(peopleRead) < 6 * 3600 { return people }
-        people = try await api.everyone()
-        peopleRead = Date()
-        for person in people where names[person.id] == nil {
-            names[person.id] = SlackAPI.shownName(person)
+        if let cached = known[api.token], !cached.people.isEmpty,
+           Date().timeIntervalSince(cached.peopleRead) < 6 * 3600 { return cached.people }
+        let people = try await api.everyone()
+        var entry = known[api.token] ?? Known()
+        entry.people = people
+        entry.peopleRead = Date()
+        for person in people where entry.names[person.id] == nil {
+            entry.names[person.id] = SlackAPI.shownName(person)
         }
+        known[api.token] = entry
         return people
     }
 
     /// Names for these user IDs; anyone Slack can't name is left out.
     func names(_ ids: Set<String>, _ api: SlackAPI) async throws -> [String: String] {
-        use(api)
-        let missing = Array(ids.subtracting(names.keys))
+        let missing = Array(ids.subtracting((known[api.token]?.names ?? [:]).keys))
         if !missing.isEmpty {
             let found = try await SlackReader.limited(missing, width: 6) { id in await api.name(of: id) }
             for (id, name) in zip(missing, found) {
-                if let name { names[id] = name }
+                if let name { known[api.token, default: Known()].names[id] = name }
             }
         }
-        return names.filter { ids.contains($0.key) }
+        return (known[api.token]?.names ?? [:]).filter { ids.contains($0.key) }
     }
 }
