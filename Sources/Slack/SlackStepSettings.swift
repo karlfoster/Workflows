@@ -15,6 +15,10 @@ struct SlackStepSettings: View {
     @State private var message: String?
     @State private var editing = false
     @State private var token = ""
+    @State private var hasClaudeKey = ClaudeKeychain.key() != nil
+    @State private var editingClaude = false
+    @State private var claudeKey = ""
+    @State private var claudeMessage: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -66,11 +70,72 @@ struct SlackStepSettings: View {
                         .disabled(token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
-            Text("With a channel or chat open in Slack, press this workflow's shortcut, choose how far back and what you'd like, and it opens in Claude. Add a token for each workspace you use; it reads with the one Slack is showing. It only reads from Slack. Requires Accessibility access.")
+            Divider()
+                .padding(.vertical, 2)
+            HStack(spacing: 6) {
+                Image(systemName: hasClaudeKey ? "checkmark.circle.fill" : "circle.dashed")
+                    .foregroundStyle(hasClaudeKey ? Color.green : Color.secondary)
+                Text(claudeMessage ?? (hasClaudeKey ? "Claude finds where the conversation on screen starts"
+                                                    : "No Claude API key: it sends the messages on screen and the ones around them"))
+                    .font(.subheadline)
+                Spacer()
+                if hasClaudeKey {
+                    Button("Remove") {
+                        ClaudeKeychain.delete()
+                        hasClaudeKey = false
+                        claudeMessage = nil
+                    }
+                    .controlSize(.small)
+                } else {
+                    Button(editingClaude ? "Cancel" : "Add Key…") {
+                        editingClaude.toggle()
+                        claudeKey = ""
+                        claudeMessage = nil
+                    }
+                    .controlSize(.small)
+                }
+            }
+            if editingClaude {
+                HStack(spacing: 8) {
+                    SecureField("Claude API key (sk-ant-…)", text: $claudeKey)
+                        .textFieldStyle(.roundedBorder)
+                        .onSubmit(saveClaude)
+                    Button("Save", action: saveClaude)
+                        .disabled(claudeKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            Text("With a channel, chat or thread open in Slack, press this workflow's shortcut and say what you'd like. It works out how much of the conversation belongs with what's on your screen and opens that in Claude. Add a token for each workspace you use; it reads with the one Slack is showing. It only reads from Slack. Requires Accessibility access.")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
         .task { await check() }
+    }
+
+    private func saveClaude() {
+        let entered = claudeKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !entered.isEmpty else { return }
+        claudeMessage = "Checking the key…"
+        Task {
+            do {
+                try await ClaudeAPI(key: entered).check()
+                guard ClaudeKeychain.save(entered) else {
+                    claudeMessage = "Couldn't save the key in the Keychain"
+                    return
+                }
+                claudeKey = ""
+                editingClaude = false
+                hasClaudeKey = true
+                claudeMessage = nil
+            } catch ClaudeError.rejectedKey {
+                claudeMessage = "Claude didn't accept the key"
+            } catch ClaudeError.unreachable {
+                claudeMessage = "Couldn't reach Claude to check the key"
+            } catch let ClaudeError.failed(message) {
+                claudeMessage = "Claude said “\(message)”"
+            } catch {
+                claudeMessage = error.localizedDescription
+            }
+        }
     }
 
     private func check() async {

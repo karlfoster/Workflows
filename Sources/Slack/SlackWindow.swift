@@ -12,6 +12,10 @@ enum SlackWindow {
         var teamID: String?
         var conversationID: String?
         var title: Title?
+        /// The messages in view in the conversation's list, top to bottom, by timestamp.
+        var onScreen: [String] = []
+        /// The message that started the thread open beside the list, if one is open.
+        var threadTs: String?
     }
 
     struct Title: Equatable {
@@ -56,14 +60,48 @@ enum SlackWindow {
         if let address = pageAddress(in: window), let parsed = parse(address: address) {
             shown.teamID = parsed.team
             shown.conversationID = parsed.conversation
+            shown.threadTs = threadTs(inAddress: address)
         }
         // Activity, Later, search and the like have no conversation in the address. If a thread
         // is open beside them, its message links name the channel or chat it belongs to.
-        if shown.conversationID == nil, let link = threadLink(in: window) {
+        let link = threadLink(in: window)
+        if shown.conversationID == nil, let link {
             shown.conversationID = conversation(inLink: link)
             if shown.conversationID != nil { shown.title = nil }
         }
+        if shown.threadTs == nil, let link { shown.threadTs = threadTs(inLink: link) }
+        shown.onScreen = messagesInView(in: window)
         return .success(shown)
+    }
+
+    /// The messages in view in the conversation's list, top to bottom. Slack gives each row of
+    /// the list an ID with its timestamp; rows scrolled out of view are kept one point high.
+    private static func messagesInView(in window: AXUIElement) -> [String] {
+        let bounds = frame(window)
+        var found: [(ts: String, top: CGFloat)] = []
+        var stack: [AXUIElement] = [window]
+        var visited = 0
+        while let element = stack.popLast(), visited < 8000 {
+            visited += 1
+            if let id = value(element, "AXDOMIdentifier") as? String, let ts = messageTs(inRowID: id) {
+                let row = frame(element)
+                if isInView(row: row, window: bounds) { found.append((ts, row.minY)) }
+                // A message's own contents hold no other messages.
+                continue
+            }
+            stack.append(contentsOf: (value(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [])
+        }
+        return found.sorted { $0.top < $1.top }.map(\.ts)
+    }
+
+    private static func frame(_ element: AXUIElement) -> CGRect {
+        guard let position = value(element, kAXPositionAttribute), let size = value(element, kAXSizeAttribute),
+              CFGetTypeID(position) == AXValueGetTypeID(), CFGetTypeID(size) == AXValueGetTypeID() else { return .zero }
+        var origin = CGPoint.zero
+        var extent = CGSize.zero
+        AXValueGetValue(position as! AXValue, .cgPoint, &origin)
+        AXValueGetValue(size as! AXValue, .cgSize, &extent)
+        return CGRect(origin: origin, size: extent)
     }
 
     /// The first message link inside an open thread pane, if there is one.
@@ -143,6 +181,47 @@ enum SlackWindow {
     }
 
     // MARK: - Parsing (no Accessibility needed)
+
+    /// "message-list_1760000000.000100" → the message's timestamp. Day dividers and the other
+    /// rows of the list ("message-list_1760003600.000200divider", "message-list_unreadDivider")
+    /// aren't messages.
+    static func messageTs(inRowID id: String) -> String? {
+        let prefix = "message-list_"
+        guard id.hasPrefix(prefix) else { return nil }
+        let rest = String(id.dropFirst(prefix.count))
+        return rest.range(of: #"^[0-9]{10}\.[0-9]{6}$"#, options: .regularExpression) != nil ? rest : nil
+    }
+
+    /// Whether a row of the list is one the eye can see: tall enough to be a message (rows
+    /// scrolled away are one point high) and inside the window.
+    static func isInView(row: CGRect, window: CGRect) -> Bool {
+        row.height >= 12 && row.intersects(window)
+    }
+
+    /// The thread open beside the list, from an address like
+    /// `https://app.slack.com/client/T0123ABCD9/C0456EFGH12/thread/C0456EFGH12-1760000000.000100`.
+    static func threadTs(inAddress address: String) -> String? {
+        guard let url = URL(string: address) else { return nil }
+        let parts = url.pathComponents
+        guard let thread = parts.firstIndex(of: "thread"), thread + 1 < parts.count else { return nil }
+        let candidate = parts[thread + 1].split(separator: "-").last.map(String.init) ?? ""
+        return candidate.range(of: #"^[0-9]{10}\.[0-9]{6}$"#, options: .regularExpression) != nil ? candidate : nil
+    }
+
+    /// The thread a message link belongs to: its `thread_ts`, else the message itself
+    /// (`…/archives/C0456EFGH12/p1794314111193889` → "1794314111.193889").
+    static func threadTs(inLink link: String) -> String? {
+        guard let url = URLComponents(string: link) else { return nil }
+        let pattern = #"^[0-9]{10}\.[0-9]{6}$"#
+        if let ts = url.queryItems?.first(where: { $0.name == "thread_ts" })?.value,
+           ts.range(of: pattern, options: .regularExpression) != nil {
+            return ts
+        }
+        guard let last = url.path.split(separator: "/").last, last.hasPrefix("p") else { return nil }
+        let digits = String(last.dropFirst())
+        guard digits.range(of: "^[0-9]{16}$", options: .regularExpression) != nil else { return nil }
+        return String(digits.prefix(10)) + "." + String(digits.suffix(6))
+    }
 
     /// The workspace and conversation in an address like
     /// `https://app.slack.com/client/T0123ABCD9/C0456EFGH12/thread/…`. The conversation is nil on

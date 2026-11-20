@@ -27,11 +27,18 @@ Send Keystroke, Type Text, Send Slack to Claude and Send Screenshot to Claude ne
 
 ## Send Slack to Claude
 
-With a channel or chat open in Slack's desktop app, press the workflow's shortcut (for example Option-Command-A). A panel opens with the conversation's name. Choose how far back to read (Today, Last 7 days, Last 50, Since I last wrote, Full history), say what you'd like Claude to do or leave it blank, and press Return. Workflows reads those messages and every thread under them, then opens a new Claude Code session in Claude's desktop app with the conversation and the ask filled in. Nothing is sent until you send it in Claude.
+With a channel, chat or thread open in Slack's desktop app, press the workflow's shortcut (for example Option-Command-A). A panel opens with the conversation's name and, a moment later, a line saying how much of it will go: "Launch date: 9 messages, Tue 17 Nov 14:10 to now". Say what you'd like Claude to do or leave it blank, and press Return (it can be pressed before the line appears). Workflows reads those messages and every thread under them, then opens a new Claude Code session in Claude's desktop app with the conversation and the ask filled in. Nothing is sent until you send it in Claude.
+
+- **How much goes:** worked out, not chosen.
+  - A thread open beside the list: the whole thread.
+  - Otherwise the discussion on screen. Slack's window says which messages are in view (each row of its list carries the message's timestamp). The newest 100 messages are read (300 with the panel's switch on Long; each press starts on Short), further back when the screen is scrolled further, and Claude's API (`claude-haiku-5-5`) is asked where the discussion those messages belong to starts and ends. What's on screen always goes.
+  - Without a Claude API key, or when Claude doesn't answer in time, the messages on screen are joined by their neighbours each way until a two-hour silence.
+  - The line is a menu: the fixed ranges (Today, Last 7 days, Last 50, Since I last wrote, Full history) are in it for when the guess is wrong.
+- **What Claude's API sees:** for that one question, the start of each of those messages (300 characters), its author, its time and how many replies it has. Its answer is two line numbers and a topic of a few words, so text in a message can't make it do anything else.
 
 - **Which conversation:** read through Accessibility from Slack's window. Its page address carries the workspace and conversation IDs. In the Direct messages view the address has no ID (`…/client/T…/dms`), so the window title's names ("Ana Silva, Ben Okafor (DM)") are matched to people and then to your DM or group chat with exactly them. Channel names in the title are the fallback for channels.
 - **Read-only:** `SlackAPI.get` refuses any Slack method outside `SlackAPI.readMethods`, so the step can't post, react or change anything, whatever the token allows.
-- **Limits:** Full history reads the newest 100 messages and every thread under them, so a small channel comes in whole and a busy one stays quick. The other choices read up to 500 messages and the replies of the newest 60 threads; older threads are marked with how many replies weren't read. If Slack asks it to slow down, the panel says it's waiting.
+- **Limits:** what was worked out comes with the replies of its newest 60 threads; older threads are marked with how many replies weren't read. Of the fixed ranges, Full history reads the newest 100 messages and every thread under them, so a small channel comes in whole and a busy one stays quick, and the others read up to 500 messages and the replies of the newest 60 threads. If Slack asks it to slow down, the panel says it's waiting.
 - **Several workspaces:** one token per workspace. The step reads with the token whose workspace Slack is showing (the address's team ID, else the window title's workspace name). A workspace with no token gets a message, not a read.
 - **Long conversations:** Claude's link takes about 14,000 characters, so the prompt holds the newest messages that fit under 12,000. The whole conversation is then saved to `~/Library/Application Support/Workflows/Slack/` and the prompt asks Claude to read that file (past 150,000 characters, to search it). Saved conversations are cleared after three days.
 - **Token:** a Slack user token (`xoxp-…`) with `channels:history`, `groups:history`, `im:history`, `mpim:history`, the matching `:read` scopes and `users:read`. Each is kept only in the login Keychain (`com.karlfoster.Workflows.slack`, one item per workspace, its account the team ID; a token saved by an older version stays under `token`). Add or remove workspaces on the step in the editor, or pipe a token in so it never shows in a command line; it's checked with Slack and saved for its workspace:
@@ -39,8 +46,13 @@ With a channel or chat open in Slack's desktop app, press the workflow's shortcu
   ```sh
   /Applications/Workflows.app/Contents/MacOS/Workflows --store-slack-token < token.txt
   ```
+- **Claude API key:** optional, for finding where the discussion starts. Kept only in the login Keychain (`com.karlfoster.Workflows.claude`). Add or remove it on the step in the editor, or pipe it in; it's checked with Claude and saved:
 
-The code is in `Sources/Slack/`. The text, prompt, chat matching and parsing are tested in `Tests/`.
+  ```sh
+  /Applications/Workflows.app/Contents/MacOS/Workflows --store-claude-key < key.txt
+  ```
+
+The code is in `Sources/Slack/`. The text, prompt, chat matching, parsing and the working out of how much to send are tested in `Tests/`.
 
 ## Send Screenshot to Claude
 
@@ -78,7 +90,7 @@ The app is signed with a Developer ID Application certificate (team UPYX9DMV5Z i
 
 ## Where data is stored
 
-Workflows and their steps are saved as JSON in the app's `UserDefaults` under the key `workflows`, so they live in `~/Library/Preferences/com.karlfoster.Workflows.plist`. Keyboard shortcuts are stored by the KeyboardShortcuts package, keyed by each workflow's UUID. The Slack tokens are in the login Keychain, and the "How far back" choice in `UserDefaults` under `slackToClaudeRange`.
+Workflows and their steps are saved as JSON in the app's `UserDefaults` under the key `workflows`, so they live in `~/Library/Preferences/com.karlfoster.Workflows.plist`. Keyboard shortcuts are stored by the KeyboardShortcuts package, keyed by each workflow's UUID. The Slack tokens and the Claude API key are in the login Keychain, and the range last picked by hand in `UserDefaults` under `slackToClaudeRange`.
 
 ## Licence
 

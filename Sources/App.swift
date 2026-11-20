@@ -6,6 +6,7 @@ struct WorkflowsApp: App {
 
     init() {
         SlackKeychain.storeFromCommandLineIfAsked()
+        ClaudeKeychain.storeFromCommandLineIfAsked()
     }
 
     var body: some Scene {

@@ -19,12 +19,12 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.karlfoster.Workflows
-        MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "1.2.0"
+        CURRENT_PROJECT_VERSION: "5"
         SWIFT_VERSION: "5.0"
         CODE_SIGN_STYLE: Manual
         # A real identity, not ad hoc ("-"), so every build is the same app to
-        # macOS: Accessibility access and the Slack token in the Keychain
+        # macOS: Accessibility access and the Slack tokens and Claude key in the Keychain
         # survive updates.
         CODE_SIGN_IDENTITY: "Developer ID Application"
         DEVELOPMENT_TEAM: UPYX9DMV5Z
@@ -45,6 +45,8 @@ targets:
       - Sources/Slack/SlackText.swift
       - Sources/Slack/SlackAPI.swift
       - Sources/Slack/SlackWindow.swift
+      - Sources/Slack/SlackContext.swift
+      - Sources/Slack/ClaudeAPI.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.karlfoster.WorkflowsTests

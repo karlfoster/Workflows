@@ -392,20 +392,73 @@ struct SlackReader {
         case .all:
             paged = try await history(oldest: nil, limit: 200)
         }
-        // Slack gives the newest first.
-        var messages = Array(paged.messages.reversed())
+        let read = try await entries(channel, Self.topLevel(paged.messages), threadCap: range.threadCap, progress: progress)
+        return SlackRead(entries: read, foundMine: foundMine, reachedStart: paged.reachedStart)
+    }
 
-        // A reply also sent to the channel shows in its thread when the thread is read.
+    /// The newest top-level messages, oldest first: `lookBack` of them
+    /// when the conversation has that many, and back as far as `covering` (the oldest message
+    /// on screen) when that's further.
+    func recent(_ channel: String, lookBack: Int = SlackContext.lookBack, covering: String?) async throws -> [Message] {
+        let wanted = Double(covering ?? "")
+        let paged = try await page(channel, oldest: nil, limit: min(lookBack, 200), cap: SlackContext.lookBackCap, until: { read in
+            guard read.count >= lookBack else { return false }
+            guard let wanted, let oldest = Double(read.last?.ts ?? "") else { return true }
+            return oldest <= wanted
+        }, progress: { _ in })
+        return Self.topLevel(Self.newest(paged.messages, lookBack: lookBack, covering: covering))
+    }
+
+    /// The newest `lookBack` of these (newest first), and on back to `covering` when it's
+    /// among the older ones: a page can bring more than was needed.
+    static func newest(_ newestFirst: [Message], lookBack: Int = SlackContext.lookBack, covering: String?) -> [Message] {
+        var keep = lookBack
+        if let wanted = Double(covering ?? ""),
+           let index = newestFirst.firstIndex(where: { (Double($0.ts) ?? 0) <= wanted }) {
+            keep = max(keep, index + 1)
+        }
+        return Array(newestFirst.prefix(keep))
+    }
+
+    /// One thread: the message that started it with its replies, nil when Slack has no such thread.
+    func thread(_ channel: String, ts: String) async throws -> SlackEntry? {
+        var messages: [Message] = []
+        var cursor = ""
+        repeat {
+            var parameters = ["channel": channel, "ts": ts, "limit": "200"]
+            if !cursor.isEmpty { parameters["cursor"] = cursor }
+            let page = try await api.get("conversations.replies", parameters, as: History.self)
+            messages += page.messages.filter { !Self.skipped.contains($0.subtype ?? "") }
+            cursor = (page.hasMore ?? false) ? (page.responseMetadata?.nextCursor ?? "") : ""
+        } while !cursor.isEmpty && messages.count < 1_000
+        // Asked for a reply's timestamp, Slack gives that reply alone: the thread is its `threadTs`.
+        if messages.count == 1, let parent = messages[0].threadTs, parent != ts {
+            return try await thread(channel, ts: parent)
+        }
+        guard let start = messages.first(where: { $0.ts == ts }) ?? messages.first else { return nil }
+        var entry = Self.entry(start)
+        entry.replies = messages.filter { $0.ts != start.ts }.map(Self.entry)
+        return entry
+    }
+
+    /// Slack gives the newest first: these are oldest first, without the replies that were also
+    /// sent to the channel (each shows in its thread when the thread is read).
+    static func topLevel(_ newestFirst: [Message]) -> [Message] {
+        var messages = Array(newestFirst.reversed())
         let starts = Set(messages.filter { ($0.replyCount ?? 0) > 0 }.map(\.ts))
         messages.removeAll { message in
             guard let thread = message.threadTs, thread != message.ts else { return false }
             return starts.contains(thread)
         }
+        return messages
+    }
 
-        let shown = messages
+    /// The messages as entries, with the replies of their threads (of the newest `threadCap`).
+    func entries(_ channel: String, _ shown: [Message], threadCap: Int,
+                 progress: @MainActor @escaping (String) -> Void) async throws -> [SlackEntry] {
         var entries = shown.map(Self.entry)
         let threads = entries.indices.filter { (shown[$0].replyCount ?? 0) > 0 }
-        let read = Array(threads.suffix(range.threadCap))
+        let read = Array(threads.suffix(threadCap))
         let reading = Set(read)
         for index in threads where !reading.contains(index) {
             entries[index].repliesNotRead = shown[index].replyCount ?? 0
@@ -424,7 +477,7 @@ struct SlackReader {
                 entries[index].repliesNotRead = max(0, (shown[index].replyCount ?? 0) - thread.count)
             }
         }
-        return SlackRead(entries: entries, foundMine: foundMine, reachedStart: paged.reachedStart)
+        return entries
     }
 
     /// Top-level messages, newest first, from `oldest` (nil: any age), page by page until
