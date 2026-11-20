@@ -187,6 +187,12 @@ private struct StepRowView: View {
 
         case .slackToClaude:
             SlackStepSettings()
+
+        case .screenshotToClaude:
+            Text("Pick an area, or press Space and click a window. It opens a new Claude Code session with the picture pasted in, ready for your prompt. Needs Screen Recording and Accessibility access.")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

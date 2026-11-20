@@ -36,6 +36,8 @@ enum Engine {
             await shell("shortcuts run \(quoted(step.text))")
         case .slackToClaude:
             await SlackToClaude.shared.run()
+        case .screenshotToClaude:
+            await ScreenshotToClaude.run()
         }
     }
 

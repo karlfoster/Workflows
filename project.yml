@@ -13,6 +13,7 @@ targets:
     platform: macOS
     sources:
       - Sources
+      - Resources
     dependencies:
       - package: KeyboardShortcuts
     settings:
@@ -28,6 +29,8 @@ targets:
         CODE_SIGN_IDENTITY: "Developer ID Application"
         DEVELOPMENT_TEAM: UPYX9DMV5Z
         GENERATE_INFOPLIST_FILE: YES
+        # The app's icon, in Resources/Assets.xcassets (drawn by ../icons/make-icons.swift).
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # Menu-bar-only app: no Dock icon, no app switcher entry.
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_NSHumanReadableCopyright: ""

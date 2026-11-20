@@ -13,6 +13,7 @@ enum StepType: String, Codable, CaseIterable, Identifiable {
     case typeText
     case runShortcut
     case slackToClaude
+    case screenshotToClaude
 
     var id: String { rawValue }
 
@@ -29,6 +30,7 @@ enum StepType: String, Codable, CaseIterable, Identifiable {
         case .typeText: "Type Text"
         case .runShortcut: "Run Apple Shortcut"
         case .slackToClaude: "Send Slack to Claude"
+        case .screenshotToClaude: "Send Screenshot to Claude"
         }
     }
 
@@ -45,6 +47,7 @@ enum StepType: String, Codable, CaseIterable, Identifiable {
         case .typeText: "character.cursor.ibeam"
         case .runShortcut: "sparkles"
         case .slackToClaude: "text.bubble"
+        case .screenshotToClaude: "camera.viewfinder"
         }
     }
 }

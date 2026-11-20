@@ -12,11 +12,13 @@
 		2BE32085EA00F05F1CB88369 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4783A062C6A34A867D786E /* App.swift */; };
 		2DD4586AF5BF395CB2B37261 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F92E4031ABC1FF6D3B470 /* Engine.swift */; };
 		38FABA6087460FC3E063F845 /* SlackKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 765C6DDBA9EE2E267D3BE698 /* SlackKeychain.swift */; };
+		3BADD62A3EBC9E34775E61CB /* ScreenshotToClaude.swift in Sources */ = {isa = PBXBuildFile; fileRef = E256BC81C950C69CB3738D33 /* ScreenshotToClaude.swift */; };
 		46D83E24FF30AEAC1DCF89A1 /* SlackWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B545BB1C982D4A4F2A675 /* SlackWindow.swift */; };
 		56847830DE01633BD9662A42 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E2F5263E9616BDB30E633B /* Models.swift */; };
 		6AD034489802EAEC060FC935 /* SlackAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964B72670A0A4A4C836129F8 /* SlackAPI.swift */; };
 		7508BF867C4DE297DDE5EB57 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E5B4330BF777A98ED474C2 /* EditorView.swift */; };
 		94ECFE80280A8D6FCCD2330E /* SlackText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D32E2FBA7B191A4231033F2 /* SlackText.swift */; };
+		998988AE148E53533D113558 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C141F0F1097B19659B7B146 /* Assets.xcassets */; };
 		B0222F8544C72A09F00A1B4C /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 59EC4B863DB294B3215ECCDE /* KeyboardShortcuts */; };
 		CBD070515820CF1167B32A01 /* SlackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7715C58958D1906331E886 /* SlackTests.swift */; };
 		D6EE5980E9BCE3E4DBE6E992 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA876AFF438B3B563D18F1D /* MenuView.swift */; };
@@ -28,6 +30,7 @@
 /* Begin PBXFileReference section */
 		10E2F5263E9616BDB30E633B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		22CD6C23C1875F2AC31F124E /* SlackToClaude.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackToClaude.swift; sourceTree = "<group>"; };
+		2C141F0F1097B19659B7B146 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		765C6DDBA9EE2E267D3BE698 /* SlackKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackKeychain.swift; sourceTree = "<group>"; };
 		82E5B4330BF777A98ED474C2 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		8C4B545BB1C982D4A4F2A675 /* SlackWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackWindow.swift; sourceTree = "<group>"; };
@@ -38,6 +41,7 @@
 		B9C299A1C4D50D628082FC91 /* SlackStepSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackStepSettings.swift; sourceTree = "<group>"; };
 		D032B5827431DFDB13B705B3 /* Workflows.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Workflows.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB7715C58958D1906331E886 /* SlackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackTests.swift; sourceTree = "<group>"; };
+		E256BC81C950C69CB3738D33 /* ScreenshotToClaude.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotToClaude.swift; sourceTree = "<group>"; };
 		F47FB440F761F54B50688585 /* WorkflowsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WorkflowsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4783A062C6A34A867D786E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,6 +83,7 @@
 		5EF962487DC8BE44769DA727 = {
 			isa = PBXGroup;
 			children = (
+				D7EBCD1E6BEC9EC96EB2E210 /* Resources */,
 				6F83AF940DE9EE3F91BB4147 /* Sources */,
 				D0488E607DE89CEB07A2DBDC /* Tests */,
 				3E99D311F2F9D3E0CE392734 /* Products */,
@@ -93,6 +98,7 @@
 				A69F92E4031ABC1FF6D3B470 /* Engine.swift */,
 				9FA876AFF438B3B563D18F1D /* MenuView.swift */,
 				10E2F5263E9616BDB30E633B /* Models.swift */,
+				E256BC81C950C69CB3738D33 /* ScreenshotToClaude.swift */,
 				0A029DDE74CC5D2CB7D97693 /* Slack */,
 			);
 			path = Sources;
@@ -104,6 +110,14 @@
 				DB7715C58958D1906331E886 /* SlackTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		D7EBCD1E6BEC9EC96EB2E210 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2C141F0F1097B19659B7B146 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,6 +145,7 @@
 			buildConfigurationList = 8FFDC80800E08BD40AEE33B5 /* Build configuration list for PBXNativeTarget "Workflows" */;
 			buildPhases = (
 				FD55B34A530D2F769C53CB50 /* Sources */,
+				C5F6CD4623312575D0BB3DDB /* Resources */,
 				70476544FEB848B3E4424041 /* Frameworks */,
 			);
 			buildRules = (
@@ -186,6 +201,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		C5F6CD4623312575D0BB3DDB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				998988AE148E53533D113558 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1BA20B1F6A5635DA343FA829 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -207,6 +233,7 @@
 				2DD4586AF5BF395CB2B37261 /* Engine.swift in Sources */,
 				D6EE5980E9BCE3E4DBE6E992 /* MenuView.swift in Sources */,
 				56847830DE01633BD9662A42 /* Models.swift in Sources */,
+				3BADD62A3EBC9E34775E61CB /* ScreenshotToClaude.swift in Sources */,
 				0EDEF6E7F2BBBB44E9198288 /* SlackAPI.swift in Sources */,
 				38FABA6087460FC3E063F845 /* SlackKeychain.swift in Sources */,
 				DE14FBA899ED4485A2136D40 /* SlackStepSettings.swift in Sources */,
