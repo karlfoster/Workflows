@@ -70,6 +70,13 @@ enum SlackWindow {
             if shown.conversationID != nil { shown.title = nil }
         }
         if shown.threadTs == nil, let link { shown.threadTs = threadTs(inLink: link) }
+        // The Threads page lists many threads, each row's ID naming its channel and thread:
+        // the one taking up most of the window is the one being read.
+        if shown.conversationID == nil, let thread = threadInView(in: window) {
+            shown.conversationID = thread.conversation
+            shown.threadTs = thread.ts
+            shown.title = nil
+        }
         shown.onScreen = messagesInView(in: window)
         return .success(shown)
     }
@@ -92,6 +99,28 @@ enum SlackWindow {
             stack.append(contentsOf: (value(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [])
         }
         return found.sorted { $0.top < $1.top }.map(\.ts)
+    }
+
+    /// On the Threads page, the thread whose rows fill the most of the window.
+    private static func threadInView(in window: AXUIElement) -> (conversation: String, ts: String)? {
+        let bounds = frame(window)
+        var shown: [String: CGFloat] = [:]
+        var stack: [AXUIElement] = [window]
+        var visited = 0
+        while let element = stack.popLast(), visited < 8000 {
+            visited += 1
+            if let id = value(element, "AXDOMIdentifier") as? String, let thread = thread(inThreadsRowID: id) {
+                let row = frame(element).intersection(bounds)
+                if !row.isNull, row.height >= 12 {
+                    shown[thread.conversation + " " + thread.ts, default: 0] += row.height
+                }
+                continue
+            }
+            stack.append(contentsOf: (value(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [])
+        }
+        guard let best = shown.max(by: { $0.value < $1.value })?.key else { return nil }
+        let parts = best.split(separator: " ").map(String.init)
+        return (parts[0], parts[1])
     }
 
     private static func frame(_ element: AXUIElement) -> CGRect {
@@ -190,6 +219,19 @@ enum SlackWindow {
         guard id.hasPrefix(prefix) else { return nil }
         let rest = String(id.dropFirst(prefix.count))
         return rest.range(of: #"^[0-9]{10}\.[0-9]{6}$"#, options: .regularExpression) != nil ? rest : nil
+    }
+
+    /// A row of the Threads page → its channel or chat and the thread it belongs to:
+    /// "threads_view_root-C0A1B394407-1795503190.058329",
+    /// "threads_view_C0A1B394407-1795503190.058329-1795524060.089719" (a reply), and the
+    /// heading, footer, divider and load-older rows the same way.
+    static func thread(inThreadsRowID id: String) -> (conversation: String, ts: String)? {
+        let pattern = #"^threads_view_(?:[a-z_]+-)?([CDG][A-Z0-9]{6,})-([0-9]{10}\.[0-9]{6})(?:-[0-9]{10}\.[0-9]{6})?$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: id, range: NSRange(id.startIndex..., in: id)),
+              let conversation = Range(match.range(at: 1), in: id),
+              let ts = Range(match.range(at: 2), in: id) else { return nil }
+        return (String(id[conversation]), String(id[ts]))
     }
 
     /// Whether a row of the list is one the eye can see: tall enough to be a message (rows

@@ -325,6 +325,19 @@ final class SlackOnScreenTests: XCTestCase {
         XCTAssertNil(SlackWindow.messageTs(inRowID: "thread_v2-C0456EFGH12-1760007200.000300"))
     }
 
+    func testThreadsPageRowsNameTheirThread() {
+        for id in ["threads_view_root-C0456EFGH12-1760000000.000100",
+                   "threads_view_heading-C0456EFGH12-1760000000.000100",
+                   "threads_view_footer-C0456EFGH12-1760000000.000100",
+                   "threads_view_C0456EFGH12-1760000000.000100-1760007200.000300"] {
+            let thread = SlackWindow.thread(inThreadsRowID: id)
+            XCTAssertEqual(thread?.conversation, "C0456EFGH12", id)
+            XCTAssertEqual(thread?.ts, "1760000000.000100", id)
+        }
+        XCTAssertNil(SlackWindow.thread(inThreadsRowID: "message-list_1760000000.000100"))
+        XCTAssertNil(SlackWindow.thread(inThreadsRowID: "threads_view_top_banner"))
+    }
+
     func testRowsScrolledAwayAreNotInView() {
         let window = CGRect(x: 49, y: 33, width: 1421, height: 923)
         XCTAssertTrue(SlackWindow.isInView(row: CGRect(x: 533, y: 218, width: 933, height: 48), window: window))
